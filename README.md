@@ -67,6 +67,9 @@ python code/copula_adapter seed0.ipynb
 
 The best model obtained from module 1 is loaded as the pretrained model. The optimal model under copula loss is saved in the `/root/autodl-tmp/warmup loader files/WorkID{work_id}_COPULA_seed{seed}_fold{fold}_X_length{X_length}_batchsize{batch_size}_num_epoch{num_epochs}.pth` and its performance on the test dataset is saved in the `./Simu/WorkID{work_id}_COPULA_seed{seed}_X_length{X_length}_batchsize{batch_size}_num_epoch{num_epochs}.csv`.
 
+## Results table
+The experiment results of OUCopula with backbones "DenseNet" and "ResNet" are reported in `summary/Densenet_summary.xlsx` and `summary/Resnet_summary.xlsx`.
+
 ## Disclaimer: 
 This code is for research purposes and is not approved for clinical use.
 
