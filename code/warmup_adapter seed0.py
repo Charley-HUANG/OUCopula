@@ -227,7 +227,6 @@ sns.heatmap(correlation_df, annot=True, cmap="coolwarm", square=True)
 plt.title("Correlation Matrix Heatmap")
 plt.savefig(simu_warmup_fold + f"WorkID{work_id}_Simu_heatmap.png") # Save the plot to an image file
 
-# 存储数据集
 PATH_ds = f'/root/autodl-tmp/warmup loader files/WorkID{work_id}_ds_XL_Data_seed{seed}_X_length{X_length}_batchsize{batch_size}_num_epoch{num_epochs}.pt'
 torch.save(ds_XL, PATH_ds)
 
@@ -504,7 +503,6 @@ def test_stage(net,  criterion_regression, test_loader):
 
 
 # %%
-# 我们添加的函数，用来计算运行/剩余时
 def format_time(seconds):
     """Formats the time in seconds into a string of hours, minutes, and seconds."""
     hours = int(seconds) // 3600
@@ -770,7 +768,6 @@ for seed in seed_list:
         PATH_dl_test = f'/root/autodl-tmp/warmup loader files/WorkID{work_id}_Simu_Test_Data_seed{seed}_fold{fold}_X_length{X_length}_batchsize{batch_size}_num_epoch{num_epochs}.pt'
         torch.save(test_loader, PATH_dl_test)
 
-        # network参数
         num_classes=[2,2]
         resnet_adapter = rsn10_adapter(num_classes).to(device)
 
