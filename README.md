@@ -57,8 +57,8 @@ python code/warmup_adapter seed0.ipynb
 The best model with lowest validation loss is stored in `./root/autodl-tmp/warmup loader files/WorkID{work_id}_Simu_Warmup_seed{seed}_fold{fold}_X_length{X_length}_batchsize{batch_size}_num_epoch{num_epochs}.pth` 
 and the performance of the best model on test dataset is stored in `./Simu/WorkID{work_id}_Simu_Warmup_seed{seed}_X_length{X_length}_batchsize{batch_size}_num_epoch{num_epochs}.csv`.
 
-#### 2. A copula estimation module that estimates the parameters in the Gaussian copula based on the results of the warm-up module; 
-#### 3. An OUCopula module that trains the backbone CNN using the derived copula-likelihood loss that can efficiently capture the dependence structure across multiple labels through a Gaussian copula model.
+#### 2. A copula estimation module that estimates the parameters in the Gaussian copula based on the results of the warm-up module
+#### 3. An OUCopula module that trains the backbone CNN using the derived copula-likelihood loss that can efficiently capture the dependence structure across multiple labels through a Gaussian copula model
 The training command for module 2 and 3 is:
 
 ```bash
@@ -70,11 +70,12 @@ The best model obtained from module 1 is loaded as the pretrained model. The opt
 ## Results table
 The experiment results of OUCopula with backbones "DenseNet" and "ResNet" are reported in `summary/Densenet_summary.xlsx` and `summary/Resnet_summary.xlsx`.
 
-## Disclaimer: 
+## Disclaimer
 This code is for research purposes and is not approved for clinical use.
 
 ## Citation
 If you find the codebase useful for your research, please cite our paper:
+
 *The citation information will be updated when the official IJCAI24 proceeding is online.*
 ```
 @inproceedings{OUCopula_IJCAI2024,
