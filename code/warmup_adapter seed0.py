@@ -66,26 +66,19 @@ seed = 0
 set_seed(seed)
 
 # %%
-# 创建保存路径
 simu_warmup_fold = "./Simu/"
 copula_fold = "./Copula/"
 
-os.makedirs(simu_warmup_fold, exist_ok=True) # 存在路径则不创建也不报错
-os.makedirs(copula_fold, exist_ok=True) # 存在路径则不创建也不报错
+os.makedirs(simu_warmup_fold, exist_ok=True)
+os.makedirs(copula_fold, exist_ok=True)
 
-# %%
-# <<<<<< 表示调参修改的项目 <<<<<<
+work_id = 100
 
-work_id = 100  # <<<<<< 这个是每个调参工作的唯一识别码，所有输出也带他，保证每次训练记录的唯一性，输出是 ”WorkID?_...“形式 <<<<<<
-
-# seed_list = [1,2] # <<<<<< 先用一个试试看
 seed_list = [0]
 
 k = 5   # <<<<<< KFOLD <<<<<<
 batch_size = 16 # <<<<<< BATCH SIZE <<<<<<
 num_epochs = 120 # <<<<<< EPOCH <<<<<<
-
-# resnet_output_size = 128  # <<<<<< ResNet输出的向量的维度，原始ResNet是1000 <<<<<<
 
 validation_split = 0.25
 shuffle_train_set = True
@@ -108,17 +101,13 @@ width_raw=height_raw=512
 transformImg=tf.Compose([tf.ToPILImage(),
                          tf.Resize((height,width)),
                          tf.ToTensor(),
-                         #tf.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)),
-                         #tf.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
                          ]) # Set image transformation
 
 # %%
 df = pd.read_csv('./label-5228-corrected.csv')
 filename = df['filename']
 
-# Z = df[['gender','age','nct','k1','k2']]
 Z = df[['gender','age']]
-# Y = df[['al','high']]
 Y = df[['al','se']]
 al = df[['al']]
 se = df[['se']]
@@ -202,7 +191,6 @@ ds_XL = TensorDataset(X_left.clone().detach().requires_grad_(True).float(),
                           torch.tensor(Y_right_se).float())
 
 # ##########################################################
- # 输出生成的ds_XL供检查
 data = []
 for i in range(len(ds_XL)):
     sample = ds_XL[i]
@@ -217,7 +205,6 @@ df.to_csv('TESTPREV.csv', index=False)
 
 
 # %%
-# 检查并调试 左右眼 al se myopia 之间的相关性
 pd.set_option('display.max_columns', None)  # Set maximum number of columns to display
 pd.set_option('display.max_colwidth', None)  # Set column width to display
 df_respones = df[["Age", "Gender",
@@ -230,7 +217,6 @@ correlation_df = pd.DataFrame(correlation_matrix, columns=df_respones.columns, i
 print('CorrMat of : '); print(correlation_matrix)
 
 
-# 查看各列的均值
 # print("Mean of: "); print(df.mean(numeric_only=True))
 print("Mean of: "); print(df[df_respones.columns].mean())
 
@@ -279,12 +265,8 @@ class rsn10_adapter (nn.Module):
         y_vec = torch.tensor([]).to(device)
         
         for i in range(2):
-            # print("i: ", i)
             task = i
             x_i = x[i]
-            
-            # print("x_i:", x_i)
-            
             
             x_i = self.conv1(x_i)
             x_i = self.bn1(x_i)
@@ -345,7 +327,7 @@ def get_test_loss(net, criterion_regression, data_loader):
        Input: net,
               criterion_classification,
               criterion_regression,
-              data_loader: 注意输入数据的结构顺序不能变
+              data_loader
        Output: loss_summary: a dictionary:
                     "avg_loss_left_classification"
                     "avg_loss_right_classification"
@@ -388,7 +370,7 @@ def get_test_loss(net, criterion_regression, data_loader):
             outputs_right_AL = outputs_right[:, 1]
 
             # Cal loss
-            loss_left_SE = criterion_regression(outputs_left_SE, labels_left_SE) # 不用reduce="none"，直接计算mean
+            loss_left_SE = criterion_regression(outputs_left_SE, labels_left_SE)
             loss_right_SE = criterion_regression(outputs_right_SE, labels_right_SE)
             loss_left_AL = criterion_regression(outputs_left_AL, labels_left_AL)
             loss_right_AL = criterion_regression(outputs_right_AL, labels_right_AL)
@@ -400,10 +382,10 @@ def get_test_loss(net, criterion_regression, data_loader):
             testing_loss_right_AL.append(loss_right_AL)
             
     # Cal the avg loss for each loss element
-    avg_loss_left_SE = torch.mean(torch.stack(testing_loss_left_SE)) # 这个没错，batch内部已经是平均值了，现在只要list的均值
-    avg_loss_right_SE = torch.mean(torch.stack(testing_loss_right_SE)) # 同上
-    avg_loss_left_AL = torch.mean(torch.stack(testing_loss_left_AL)) # 这个没错，batch内部已经是平均值了，现在只要list的均值
-    avg_loss_right_AL =torch.mean(torch.stack(testing_loss_right_AL)) # 同上
+    avg_loss_left_SE = torch.mean(torch.stack(testing_loss_left_SE))
+    avg_loss_right_SE = torch.mean(torch.stack(testing_loss_right_SE))
+    avg_loss_left_AL = torch.mean(torch.stack(testing_loss_left_AL))
+    avg_loss_right_AL =torch.mean(torch.stack(testing_loss_right_AL))
 
     # Agg loss by row, col and total
     avg_loss_left = avg_loss_left_SE + avg_loss_left_AL
@@ -472,9 +454,7 @@ def test_stage(net,  criterion_regression, test_loader):
             outputs_right_AL = outputs_right[:, 1]
 
             # Cal loss
-            # print("outputs_left_classification: ", outputs_left_classification)
-            # print("labels_left_classification: ", labels_left_classification)
-            loss_left_SE = criterion_regression(outputs_left_SE, labels_left_SE)  # 不用reduce="none"，直接计算mean
+            loss_left_SE = criterion_regression(outputs_left_SE, labels_left_SE)
             loss_right_SE = criterion_regression(outputs_right_SE, labels_right_SE)
             loss_left_AL = criterion_regression(outputs_left_AL, labels_left_AL)
             loss_right_AL = criterion_regression(outputs_right_AL, labels_right_AL)
@@ -488,10 +468,10 @@ def test_stage(net,  criterion_regression, test_loader):
             
 
     # Cal the avg loss for each loss element
-    avg_loss_left_SE = torch.mean(torch.stack(testing_loss_left_SE))  # 这个没错，batch内部已经是平均值了，现在只要list的均值
-    avg_loss_right_SE = torch.mean(torch.stack(testing_loss_right_SE))  # 同上
-    avg_loss_left_AL = torch.mean(torch.stack(testing_loss_left_AL))  # 这个没错，batch内部已经是平均值了，现在只要list的均值
-    avg_loss_right_AL = torch.mean(torch.stack(testing_loss_right_AL))  # 同上
+    avg_loss_left_SE = torch.mean(torch.stack(testing_loss_left_SE))
+    avg_loss_right_SE = torch.mean(torch.stack(testing_loss_right_SE))
+    avg_loss_left_AL = torch.mean(torch.stack(testing_loss_left_AL))
+    avg_loss_right_AL = torch.mean(torch.stack(testing_loss_right_AL))
 
     # Agg loss by row, col and total
     avg_loss_left = avg_loss_left_SE + avg_loss_left_AL
@@ -549,21 +529,21 @@ def print_training_progress(epoch, total_epochs, time_elapsed, kfold, present_fo
 def train_model(model, criterion_regression, optimizer, scheduler, dl_train, dl_val, dl_test,
                 num_epochs):
     """Object:
-       Input: model: 就是net，你构造的需要训练的网络
+       Input: model:
               criterion_classification:
               criterion_regression:
-              optimizer: 实例化的一个优化器
+              optimizer:
               scheduler:
               dl_train:
               dl_val:
               num_epochs:
     """
 
-    best_model_wts = copy.deepcopy(model.state_dict())  # 存储最佳参数
-    least_loss = 10000000.0  # 存储最小损失
-    best_epoch_num = 0  # 存储? # TODO
+    best_model_wts = copy.deepcopy(model.state_dict())
+    least_loss = 10000000.0
+    best_epoch_num = 0
     val_loss = []  # return of get_test_loss per 20 batch
-    n_train = int(len(dl_train))  # loader的长度，注意不是图片的张数，要翻倍
+    n_train = int(len(dl_train))
 
     # For plot
     train_loss_batchwise = []
@@ -585,7 +565,7 @@ def train_model(model, criterion_regression, optimizer, scheduler, dl_train, dl_
         running_loss_temp = 0.0
 
         # Loop train data in one epoch
-        for i, data in enumerate(dl_train, 0):  # i 从0开始
+        for i, data in enumerate(dl_train, 0):
             # Load data from loader (below 4 lines)
             X_left, X_right, age, gender, *labels = data
             inputs = X_left, X_right, age, gender
@@ -600,14 +580,11 @@ def train_model(model, criterion_regression, optimizer, scheduler, dl_train, dl_
             labels_left_AL = labels[2].squeeze().to(device)
             labels_right_AL = labels[4].squeeze().to(device)
 
-            # 训练过程
-            # 反向传播之前初始化梯度就行，这里我们放在最前面
             optimizer.zero_grad()
 
             # forward
             # track history if only in train
             with torch.set_grad_enabled(True):
-                # 前向传播
                 outputs_left, outputs_right = model(inputs)
                 outputs_left_SE = outputs_left[:, 0]
                 outputs_right_SE = outputs_right[:, 0]
@@ -615,7 +592,7 @@ def train_model(model, criterion_regression, optimizer, scheduler, dl_train, dl_
                 outputs_right_AL = outputs_right[:, 1]
 
                 # Cal loss elementwise
-                loss_left_SE = criterion_regression(outputs_left_SE, labels_left_SE)  # 不用reduce="none"，直接计算mean
+                loss_left_SE = criterion_regression(outputs_left_SE, labels_left_SE)
                 loss_right_SE = criterion_regression(outputs_right_SE, labels_right_SE)
                 loss_left_AL = criterion_regression(outputs_left_AL, labels_left_AL)
                 loss_right_AL = criterion_regression(outputs_right_AL, labels_right_AL)
@@ -623,13 +600,12 @@ def train_model(model, criterion_regression, optimizer, scheduler, dl_train, dl_
                 # Agg element loss by row, col and total
                 loss = loss_left_SE + loss_right_SE + loss_left_AL + loss_right_AL
 
-                # 反向传播
                 loss.backward()
-                # 更新
+
                 optimizer.step()
 
-            running_loss += loss.item()  # 记录每个epoch的平均loss
-            running_loss_temp += loss.item()  # 记录每20个batch的累计loss
+            running_loss += loss.item()
+            running_loss_temp += loss.item()
 
             if i % 20 == 19:
                 val_loss_summary = get_test_loss(model,  criterion_regression, dl_val)
@@ -645,8 +621,6 @@ def train_model(model, criterion_regression, optimizer, scheduler, dl_train, dl_
                     f'[Num of batch: {i + 1:2d}] Avg train loss past 20 batch: {running_loss_temp / 20 :.3f} | Val LRClaRegTot loss this batch: {avg_loss_str} ')  # Epoch: {epoch + 1},
                 running_loss_temp = 0.0
 
-        # 每个epoch结束时计算三个loss，输出，并在之后用来画loss plot
-        # 下方使用item，把cuda里的tensor的数值部分提取到cpu里，这种方法比什么tensor.to("cpu")来得直接
         train_loss_summary = get_test_loss(model,  criterion_regression, dl_train)
         val_loss_summary = get_test_loss(model,  criterion_regression, dl_val)
         test_loss_summary = get_test_loss(model,  criterion_regression, dl_test)
@@ -661,11 +635,11 @@ def train_model(model, criterion_regression, optimizer, scheduler, dl_train, dl_
         print("Test loss this batch:  ", test_loss_summary["avg_loss"].item())
         print("-"*20)
 
-        scheduler.step()  # 放在epoch循环里
+        scheduler.step()
         
         avg_val_loss_this_epoch = get_test_loss(model,  criterion_regression, dl_val)["avg_loss"]
 
-        if avg_val_loss_this_epoch < least_loss: # 使用val loss选择最优模型
+        if avg_val_loss_this_epoch < least_loss:
             least_loss = avg_val_loss_this_epoch
             best_model_wts = copy.deepcopy(model.state_dict())
             best_epoch_num = epoch
@@ -779,15 +753,6 @@ for seed in seed_list:
             np.random.shuffle(train_idx)
         train_indices, val_indices = train_idx[split:], train_idx[:split]
 
-        # train_sampler = SubsetRandomSampler(train_indices)
-        # val_sampler = SubsetRandomSampler(val_indices)
-        # test_sampler = SubsetRandomSampler(test_idx)
-
-        # train_loader = DataLoader(ds_XL, batch_size=batch_size, sampler=train_sampler, shuffle=True, drop_last=True)
-        # val_loader = DataLoader(ds_XL, batch_size=batch_size, sampler=val_sampler, shuffle=False, drop_last=True)
-        # test_loader = DataLoader(ds_XL, batch_size=batch_size, sampler=test_sampler, shuffle=False, drop_last=True)
-
-        # 上述代码会出现loss锯齿下降，使用下述代码不会出现，而是正常的锯齿下降
         train_dataset = Subset(ds_XL, train_indices)
         val_dataset = Subset(ds_XL, val_indices)
         test_dataset = Subset(ds_XL, test_idx)
@@ -796,8 +761,6 @@ for seed in seed_list:
         val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False, drop_last=True)
         test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False, drop_last=True)
 
-        # 存储划分的数据集以便copula直接调用，从源头防止数据泄露！ @2023-09-27
-        # warmup和copula我的batch size设置的也必须是一样的
         PATH_dl_train = f'/root/autodl-tmp/warmup loader files/WorkID{work_id}_Simu_Train_Data_seed{seed}_fold{fold}_X_length{X_length}_batchsize{batch_size}_num_epoch{num_epochs}.pt'
         torch.save(train_loader, PATH_dl_train)
 
@@ -811,9 +774,6 @@ for seed in seed_list:
         num_classes=[2,2]
         resnet_adapter = rsn10_adapter(num_classes).to(device)
 
-        # Criterion
-        # criterion_classification = nn.BCEWithLogitsLoss()
-        # criterion_classification = nn.BCELoss()
         criterion_regression = nn.MSELoss()
 
         # Observe that all parameters are being optimized
@@ -822,9 +782,8 @@ for seed in seed_list:
         # Decay LR by a factor of ~ every ~ epochs
         exp_lr_scheduler = lr_scheduler.StepLR(optimizer, step_size=lr_decay_step_size, gamma=lr_decay_prop)
 
-        #====== 训练模型 ======
         resnet_adapter, train_loss_batchwise, val_loss_batchwise, test_loss_batchwise = train_model(resnet_adapter, criterion_regression, optimizer, exp_lr_scheduler, train_loader, val_loader, test_loader, num_epochs)
-            # Now oucopula is the best parameter setting acquired in this fold
+        # Now oucopula is the best parameter setting acquired in this fold
         # Record batchwise for all folds to plot the loss plot for whole training process
         train_loss_batchwise_allfold = [*train_loss_batchwise_allfold, *train_loss_batchwise]
         val_loss_batchwise_allfold = [*val_loss_batchwise_allfold, *val_loss_batchwise]
@@ -835,16 +794,13 @@ for seed in seed_list:
         print("Train, validation, & test loss per 20 epoch")
         plot_loss(batch_num_per_epoch, train_loss_batchwise_allfold, val_loss_batchwise_allfold, test_loss_batchwise_allfold)
 
-        #====== 记录模型 ======
-        # For 本地
         warm_up_PATH = f'/root/autodl-tmp/warmup loader files/WorkID{work_id}_Simu_Warmup_seed{seed}_fold{fold}_X_length{X_length}_batchsize{batch_size}_num_epoch{num_epochs}.pth'
 
         # Save the best parameter setting in warm_up_PATH
-        torch.save(resnet_adapter.state_dict(), warm_up_PATH) # 模型提取 state_dict状态字典 并保存
+        torch.save(resnet_adapter.state_dict(), warm_up_PATH)
 
-        #====== 测试模型 ======
-        oucopula_test = rsn10_adapter(num_classes).to(device) # 载入模型之前先初始化
-        oucopula_test.load_state_dict(torch.load(warm_up_PATH)) # 载入模型：先从PATH载入状态字典，再load_state_dict
+        oucopula_test = rsn10_adapter(num_classes).to(device)
+        oucopula_test.load_state_dict(torch.load(warm_up_PATH))
 
         # Test the best model in this fold
         loss_summary = test_stage(oucopula_test,  criterion_regression, test_loader)
@@ -861,14 +817,5 @@ for seed in seed_list:
     time_elapsed = time.time() - since
     print(f'Training complete in {time_elapsed // 60:.0f}m {time_elapsed % 60:.0f}s')
 
-    # 输出到csv上的结果，我们只基于test dataset
     pd.DataFrame(history).to_csv(f'./Simu/WorkID{work_id}_Simu_Warmup_seed{seed}_X_length{X_length}_batchsize{batch_size}_num_epoch{num_epochs}.csv', index=True)
-
-
 # %%
-
-
-# %%
-
-
-
