@@ -47,7 +47,7 @@ The OU UWF fundus images dataset is temporary not available for public access an
 
 ## How to train and use
 The training process of OUCopula including three modules: 
-#### 1. a warm-up module with adapter modules that trains the backbone CNN under empirical losses
+#### 1. A warm-up module with adapter modules that trains the backbone CNN under empirical losses
 The training command for module 1 is:
 
 ```bash 
@@ -57,8 +57,8 @@ python code/warmup_adapter seed0.ipynb
 The best model with lowest validation loss is stored in `./root/autodl-tmp/warmup loader files/WorkID{work_id}_Simu_Warmup_seed{seed}_fold{fold}_X_length{X_length}_batchsize{batch_size}_num_epoch{num_epochs}.pth` 
 and the performance of the best model on test dataset is stored in `./Simu/WorkID{work_id}_Simu_Warmup_seed{seed}_X_length{X_length}_batchsize{batch_size}_num_epoch{num_epochs}.csv`.
 
-#### 2. a copula estimation module that estimates the parameters in the Gaussian copula based on the results of the warm-up module; 
-#### 3. an OUCopula module that trains the backbone CNN using the derived copula-likelihood loss that can efficiently capture the dependence structure across multiple labels through a Gaussian copula model.
+#### 2. A copula estimation module that estimates the parameters in the Gaussian copula based on the results of the warm-up module; 
+#### 3. An OUCopula module that trains the backbone CNN using the derived copula-likelihood loss that can efficiently capture the dependence structure across multiple labels through a Gaussian copula model.
 The training command for module 2 and 3 is:
 
 ```bash
