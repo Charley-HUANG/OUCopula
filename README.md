@@ -2,7 +2,7 @@
 
 <div align="center">
 
-# OUCopula: Bi-Channel Multi-Label Copula-Enhanced Adapter-Based CNN for Myopia Screening Based on OU-UWF Images
+# OUCopula: Bi-Channel Multi-Label Copula-Enhanced Adapter-Based CNN for Myopia Screening Based on OU-UWF Images (IJCAI2024 Accepted)
 
 [![IJCAI2024](https://img.shields.io/badge/arXiv-2403.11974-blue)](https://doi.org/10.48550/arXiv.2403.11974) [![IJCAI2024](https://img.shields.io/badge/Conference-IJCAI2024-green)](https://doi.org/10.48550/arXiv.2403.11974)
 
@@ -10,7 +10,9 @@
 
 </div>
 
-The code for paper " OUCopula: Bi-Channel Multi-Label Copula-Enhanced Adapter-Based CNN for Myopia Screening Based on OU-UWF Images (IJCAI 2024 Accepted)’’.
+The code for paper " OUCopula: Bi-Channel Multi-Label Copula-Enhanced Adapter-Based CNN for Myopia Screening Based on OU-UWF Images (IJCAI2024 Accepted)’’.
+
+
 
 ![Readme Banner](fig/readme_banner.png)
 
@@ -70,7 +72,7 @@ This code is for research purposes and is not approved for clinical use.
 
 ## Citation
 If you find the codebase useful for your research, please cite our paper:
-*The formal conference bibtex will be provided once it becomes available.*
+*The citation information will be updated when the official IJCAI24 proceeding is online.*
 ```
 @inproceedings{OUCopula_IJCAI2024,
   title     = {OUCopula: Bi-Channel Multi-Label Copula-Enhanced Adapter-Based CNN for Myopia Screening Based on OU-UWF Images},
